@@ -1,17 +1,21 @@
-package hello.itemservice.domain;
+package hello.itemservice.domain.item;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-@Getter
-@Setter
+import java.util.List;
+
+@Data
 @NoArgsConstructor
 public class Item {
     private Long id;
     private String itemName;
     private Integer price;
     private Integer quantity;
+    private Boolean open;
+    private List<String> regions;
+    private ItemType itemType;
+    private String deliveryCode;
 
     public Item(String itemName, Integer price, Integer quantity) {
         this.id = id;
