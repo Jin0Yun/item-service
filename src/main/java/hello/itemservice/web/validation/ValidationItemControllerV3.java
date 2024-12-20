@@ -11,10 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @Controller
@@ -22,29 +19,6 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ValidationItemControllerV3 {
     private final ItemRepository itemRepository;
-
-    @ModelAttribute("regions")
-    public Map<String, String> regions() {
-        Map<String, String> regions = new LinkedHashMap<>();
-        regions.put("SEOUL", "서울");
-        regions.put("BUSAN", "부산");
-        regions.put("JEJU", "제주");
-        return regions;
-    }
-
-    @ModelAttribute("itemTypes")
-    public ItemType[] itemTypes() {
-        return ItemType.values();
-    }
-
-    @ModelAttribute("deliveryCodes")
-    public List<DeliveryCode> deliveryCodes() {
-        List<DeliveryCode> deliveryCodes = new ArrayList<>();
-        deliveryCodes.add(new DeliveryCode("FAST", "빠른 배송"));
-        deliveryCodes.add(new DeliveryCode("NORMAL", "일반 배송"));
-        deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
-        return deliveryCodes;
-    }
 
     @GetMapping
     public String items(Model model) {
@@ -87,7 +61,7 @@ public class ValidationItemControllerV3 {
     }
 
     @PostMapping("/add")
-    public String addItem2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
+    public String addItemV2(@Validated(SaveCheck.class) @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
@@ -118,7 +92,7 @@ public class ValidationItemControllerV3 {
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
-                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
 
@@ -136,7 +110,7 @@ public class ValidationItemControllerV3 {
         if (item.getPrice() != null && item.getQuantity() != null) {
             int resultPrice = item.getPrice() * item.getQuantity();
             if (resultPrice < 10000) {
-                bindingResult.addError(new ObjectError("item", null, null, "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice));
+                bindingResult.reject("totalPriceMin", new Object[]{10000, resultPrice}, null);
             }
         }
 
