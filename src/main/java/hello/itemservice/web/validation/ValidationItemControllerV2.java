@@ -4,7 +4,6 @@ import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -56,12 +55,6 @@ public class ValidationItemControllerV2 {
         return deliveryCodes;
     }
 
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
-    }
-
     @GetMapping
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
@@ -83,7 +76,7 @@ public class ValidationItemControllerV2 {
     }
 
     //@PostMapping("/add")
-    public String addItemV1(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addItemV1(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, null, null, "상품 이름은 필수입니다."));
         }
@@ -113,7 +106,7 @@ public class ValidationItemControllerV2 {
     }
 
     //@PostMapping("/add")
-    public String addItemV2(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addItemV2(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.addError(new FieldError("item", "itemName", item.getItemName(), false, new String[]{"required.item.itemName"}, null, null));
         }
@@ -143,7 +136,7 @@ public class ValidationItemControllerV2 {
     }
 
     //@PostMapping("/add")
-    public String addItemV3(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addItemV3(Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (!StringUtils.hasText(item.getItemName())) {
             bindingResult.rejectValue("itemName", "required");
         }
@@ -173,7 +166,7 @@ public class ValidationItemControllerV2 {
     }
 
     //@PostMapping("/add")
-    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addItemV4(@ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         itemValidator.validate(item, bindingResult);
 
         if (bindingResult.hasErrors()) {
@@ -188,7 +181,7 @@ public class ValidationItemControllerV2 {
     }
 
     @PostMapping("/add")
-    public String addItemV5(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes, Model model) {
+    public String addItemV5(@Validated @ModelAttribute Item item, BindingResult bindingResult, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             log.info("error={}", bindingResult);
             return "validation/v2/addForm";

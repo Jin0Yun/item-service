@@ -4,7 +4,6 @@ import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
@@ -43,13 +42,6 @@ public class ValidationItemControllerV1 {
         deliveryCodes.add(new DeliveryCode("NORMAL", "일반 배송"));
         deliveryCodes.add(new DeliveryCode("SLOW", "느린 배송"));
         return deliveryCodes;
-    }
-
-
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
     }
 
     @GetMapping
