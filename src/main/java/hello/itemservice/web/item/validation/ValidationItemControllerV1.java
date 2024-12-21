@@ -1,27 +1,24 @@
-package hello.itemservice.web.form;
+package hello.itemservice.web.item.validation;
 
 import hello.itemservice.domain.item.DeliveryCode;
 import hello.itemservice.domain.item.Item;
 import hello.itemservice.domain.item.ItemRepository;
 import hello.itemservice.domain.item.ItemType;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Controller
-@RequestMapping("/form/items")
+@RequestMapping("/validation/v1/items")
 @RequiredArgsConstructor
-public class FormItemController {
+public class ValidationItemControllerV1 {
     private final ItemRepository itemRepository;
 
     @ModelAttribute("regions")
@@ -47,93 +44,69 @@ public class FormItemController {
         return deliveryCodes;
     }
 
-    @PostConstruct
-    public void init() {
-        itemRepository.save(new Item("itemA", 10000, 10));
-        itemRepository.save(new Item("itemB", 20000, 20));
-    }
-
     @GetMapping
     public String items(Model model) {
         List<Item> items = itemRepository.findAll();
         model.addAttribute("items", items);
-        return "form/items";
+        return "validation/v1/items";
     }
 
     @GetMapping("/{itemId}")
     public String item(@PathVariable long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "form/item";
+        return "validation/v1/item";
     }
 
     @GetMapping("/add")
     public String addForm(Model model) {
         model.addAttribute("item", new Item());
-        return "form/addForm";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV1(@RequestParam String itemName,
-                            @RequestParam int price,
-                            @RequestParam Integer quantity,
-                            Model model
-    ) {
-        Item item = new Item();
-        item.setItemName(itemName);
-        item.setPrice(price);
-        item.setQuantity(quantity);
-
-        itemRepository.save(item);
-        model.addAttribute("item", item);
-        return "form/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV2(@ModelAttribute("item") Item item, Model model) {
-        itemRepository.save(item);
-        return "form/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV3(@ModelAttribute Item item) {
-        itemRepository.save(item);
-        return "form/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV4(Item item) {
-        itemRepository.save(item);
-        return "form/item";
-    }
-
-    //    @PostMapping("/add")
-    public String addItemV5(Item item) {
-        itemRepository.save(item);
-        return "redirect:/form/items/" + item.getId();
+        return "validation/v1/addForm";
     }
 
     @PostMapping("/add")
-    public String addItemV6(Item item, RedirectAttributes redirectAttributes) {
-        log.info("item.kopen={}", item.getOpen());
-        log.info("item.regions={}", item.getRegions());
+    public String addItemV1(Item item, RedirectAttributes redirectAttributes, Model model) {
+        Map<String, String> errors = new HashMap<>();
+
+        if (!StringUtils.hasText(item.getItemName())) {
+            errors.put("itemName", "상품 이름은 필수입니다.");
+        }
+        if (item.getPrice() == null || item.getPrice() < 1000 || item.getPrice() > 1000000) {
+            errors.put("price", "가격은 1,000 ~ 1,000,000까지 허용합니다.");
+        }
+        if (item.getQuantity() == null || item.getQuantity() >= 9999) {
+            errors.put("quantity", "수량은 최대 9,999까지 허용합니다.");
+        }
+
+        if (item.getPrice() != null && item.getQuantity() != null) {
+            int resultPrice = item.getPrice() * item.getQuantity();
+            if (resultPrice < 10000) {
+                errors.put("globalError", "가격 * 수량의 합은 10,000원 이상이어야 합니다. 현재 값 = " + resultPrice);
+            }
+        }
+
+        if (!errors.isEmpty()) {
+            model.addAttribute("errors", errors);
+            return "validation/v1/addForm";
+        }
+
         Item savedItem = itemRepository.save(item);
         redirectAttributes.addAttribute("itemId", savedItem.getId());
         redirectAttributes.addAttribute("status", true);
-        return "redirect:/form/items/{itemId}";
+        return "redirect:/validation/v1/items/{itemId}";
     }
 
     @GetMapping("/{itemId}/edit")
     public String editForm(@PathVariable Long itemId, Model model) {
         Item item = itemRepository.findById(itemId);
         model.addAttribute("item", item);
-        return "form/editForm";
+        return "validation/v1/editForm";
     }
 
     @PostMapping("/{itemId}/edit")
     public String edit(@PathVariable Long itemId, @ModelAttribute Item item) {
         itemRepository.update(itemId, item);
-        return "redirect:/form/items/{itemId}";
+        return "redirect:/validation/v1/items/{itemId}";
     }
 }
 

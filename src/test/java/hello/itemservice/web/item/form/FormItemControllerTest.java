@@ -1,4 +1,4 @@
-package hello.itemservice.web.form;
+package hello.itemservice.web.item.form;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

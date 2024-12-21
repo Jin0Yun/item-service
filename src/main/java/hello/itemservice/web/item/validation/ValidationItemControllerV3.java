@@ -1,4 +1,4 @@
-package hello.itemservice.web.validation;
+package hello.itemservice.web.item.validation;
 
 import hello.itemservice.domain.item.*;
 import lombok.RequiredArgsConstructor;

@@ -1,4 +1,4 @@
-package hello.itemservice.validation;
+package hello.itemservice.web.item.validation;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.DefaultMessageCodesResolver;

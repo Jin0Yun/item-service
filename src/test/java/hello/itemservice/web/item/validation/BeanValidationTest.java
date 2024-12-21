@@ -1,4 +1,4 @@
-package hello.itemservice.validation;
+package hello.itemservice.web.item.validation;
 
 import hello.itemservice.domain.item.Item;
 import jakarta.validation.ConstraintViolation;
