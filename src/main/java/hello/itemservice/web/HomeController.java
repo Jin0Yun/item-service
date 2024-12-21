@@ -2,6 +2,7 @@ package hello.itemservice.web;
 
 import hello.itemservice.domain.member.Member;
 import hello.itemservice.domain.member.MemberRepository;
+import hello.itemservice.web.argumentresolver.Login;
 import hello.itemservice.web.session.SessionManager;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -69,12 +70,22 @@ public class HomeController {
         return "loginHome";
     }
 
-    @GetMapping("/")
+    //@GetMapping("/")
     public String homeLoginV3Spring(
             @SessionAttribute(name = SessionConst.LOGIN_MEMBER, required = false)
             Member loginMember,
             Model model
     ) {
+        if (loginMember == null) {
+            return "home";
+        }
+
+        model.addAttribute("member", loginMember);
+        return "loginHome";
+    }
+
+    @GetMapping("/")
+    public String homeLoginV3ArgumentResolver(@Login Member loginMember, Model model) {
         if (loginMember == null) {
             return "home";
         }
